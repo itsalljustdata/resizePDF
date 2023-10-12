@@ -1,4 +1,4 @@
-from configFileHelper import Config
+from configparser import ConfigParser
 
 from pathlib import Path
 from datetime import datetime
@@ -36,8 +36,11 @@ except AttributeError:
     pass
 
 
-def getConfig(configFile: str = "config.json"):
-
-    config = Config(file_path=Path(configFile).resolve())
-    ic_set(config.get_bool("APP/DEBUG"))
+def getConfig(configFile: str = "config.ini"):
+    config = ConfigParser(converters={'ListCSV'     : lambda x: [i.strip() for i in x.split(',')]
+                                     ,'PathListCSV' : lambda x: [Path(i.strip()) for i in x.split(',')]
+                                     }
+                         )
+    config.read(filenames=Path(configFile).resolve())
+    ic_set(config.getboolean("APP","DEBUG"))
     return config
